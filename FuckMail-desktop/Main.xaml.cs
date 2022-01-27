@@ -28,6 +28,8 @@ namespace FuckMail_desktop
     /// </summary>
     public partial class Main : Window
     {
+        Config config = new Config();
+
         class SomeType
         {
             public string[] addresses { get; set; }
@@ -46,11 +48,11 @@ namespace FuckMail_desktop
         public Main(string username, string sessionID)
         {
             InitializeComponent();
-            getAllAddresses(username);
+            getAllAddresses(config.host, username);
         }
 
-        private void getAllAddresses(string username) {
-            var url = String.Format("http://127.0.0.1:8000/api/addresses/{0}", username);
+        private void getAllAddresses(string host, string username) {
+            var url = String.Format("http://{0}/api/addresses/{1}", host, username);
             var request = WebRequest.Create(url);
             request.Method = "GET";
 
@@ -75,8 +77,8 @@ namespace FuckMail_desktop
             }
         }
 
-        private void getAllMessages(string username, string address) {
-            var url = String.Format("http://127.0.0.1:8000/api/address_data/{0}/{1}", username, address);
+        private void getAllMessages(string host, string username, string address) {
+            var url = String.Format("http://{0}/api/address_data/{1}/{2}", host, username, address);
             var request = WebRequest.Create(url);
             request.Method = "GET";
 
@@ -125,7 +127,7 @@ namespace FuckMail_desktop
         {
             Button btn = sender as Button;
             Application.Current.Dispatcher.Invoke(new Action(() => {
-                getAllMessages(btn.Name.ToString(), btn.Content.ToString());
+                getAllMessages(config.host, btn.Name.ToString(), btn.Content.ToString());
             }));
         }
 
