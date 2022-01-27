@@ -17,6 +17,7 @@ using System.Net;
 using System.IO;
 using System.Text.Json;
 using Newtonsoft.Json;
+using System.Configuration;
 
 namespace FuckMail_desktop
 {
@@ -25,12 +26,16 @@ namespace FuckMail_desktop
     /// </summary>
     public partial class Auth : Window
     {
+        Config config = new Config();
+
         class SomeType {
             public bool response { get; set; }
         }
 
         public Auth()
         {
+            //string host = ConfigurationManager.AppSettings.Get("host");
+
             if (!Directory.Exists("data"))
             {
                 Directory.CreateDirectory("data");
@@ -55,7 +60,7 @@ namespace FuckMail_desktop
                     }
                     else
                     {
-                        if (!CheckAuth(metadata[0], metadata[1], false))
+                        if (!CheckAuth(config.host, metadata[0], metadata[1], false))
                         {
                             Directory.Delete("data", true);
                             Directory.CreateDirectory("data");
@@ -84,7 +89,7 @@ namespace FuckMail_desktop
             }
             else
             {
-                if (!CheckAuth(username, password, true))
+                if (!CheckAuth(config.host, username, password, true))
                 {
                     MessageBox.Show("Incorrect data!");
                 }
@@ -111,9 +116,9 @@ namespace FuckMail_desktop
             }
         }
 
-        public bool CheckAuth(string username, string password, bool md5) {
+        public bool CheckAuth(string host, string username, string password, bool md5) {
             string hashPass = md5 ? CreateMD5(password) : password;
-            var url = String.Format("http://127.0.0.1:8000/api/auth/{0}/{1}", username, hashPass);
+            var url = String.Format("http://{0}/api/auth/{1}/{2}", host, username, hashPass);
             var request = WebRequest.Create(url);
             request.Method = "GET";
 
