@@ -1,7 +1,7 @@
-# FuckMail Instruction
+# FuckMail-desktop Instruction
 
-## Add config variables
-Change host `App.config` (default: 127.0.0.1 (localhost)):
+## Add or change config variables
+Change host `App.config` in Fuckmail-desktop (default: 127.0.0.1:8000 (localhost)):
 
 ```yaml
 <add key="host" value="" />
