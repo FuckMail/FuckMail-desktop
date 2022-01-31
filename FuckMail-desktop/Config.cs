@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using System.Configuration;
 
 namespace FuckMail_desktop
-{
+{   
+    // Config
     public class Config
     {
         public string host {
