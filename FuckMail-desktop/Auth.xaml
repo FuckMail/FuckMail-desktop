@@ -5,16 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FuckMail_desktop"
         mc:Ignorable="d"
-        Title="FuckMail" Height="450" Width="800" ResizeMode="CanMinimize">
+        Title="FuckMail" Height="450" Width="800" ResizeMode="CanMinimize" FontFamily="Arial" FontWeight="Bold" Background="#FF0F2027">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="237*"/>
             <ColumnDefinition Width="556*"/>
         </Grid.ColumnDefinitions>
-        <TextBox Name="username_txtBox" HorizontalAlignment="Left" Height="23" Margin="41.6,114,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="230" TextChanged="TextBox_TextChanged" Grid.Column="1"/>
+        <TextBox Name="username_txtBox" HorizontalAlignment="Left" Height="24" Margin="41.2,114,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="230" TextChanged="TextBox_TextChanged" Grid.Column="1" FontFamily="Segoe UI" FontWeight="Normal"/>
         <Button Name="login_btn" Content="Login" HorizontalAlignment="Left" Margin="41.6,202,0,0" VerticalAlignment="Top" Width="84" Height="30" RenderTransformOrigin="0.229,0.52" Click="login_btn_Click" Grid.Column="1"/>
         <Button Content="Sign Up" HorizontalAlignment="Left" Margin="139.6,202,0,0" VerticalAlignment="Top" Width="132" Height="30" Grid.Column="1" IsEnabled="False"/>
         <Label Content="LogIn" HorizontalAlignment="Left" Margin="41.6,74,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.167,0.516" Width="230" Foreground="White" Background="Gray" Grid.Column="1"/>
-        <PasswordBox Name="password_txtBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="41.2,153,0,0" VerticalAlignment="Top" Width="230"/>
+        <PasswordBox Name="password_txtBox" Grid.Column="1" HorizontalAlignment="Left" Height="24" Margin="41.2,153,0,0" VerticalAlignment="Top" Width="230" FontFamily="Segoe UI" FontWeight="Normal"/>
     </Grid>
 </Window>
