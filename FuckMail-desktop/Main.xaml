@@ -5,30 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FuckMail_desktop"
         mc:Ignorable="d"
-        Title="FuckMail" Height="550" Width="1000" ResizeMode="CanMinimize">
+        Title="FuckMail" Height="700" Width="1300" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" FontFamily="Arial" FontWeight="Bold" Background="#FF0F2027">
     <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="209*"></ColumnDefinition>
-            <ColumnDefinition Width="218*"></ColumnDefinition>
+            <ColumnDefinition Width="174*"></ColumnDefinition>
+            <ColumnDefinition Width="181*"></ColumnDefinition>
             <ColumnDefinition Width="0*"></ColumnDefinition>
-            <ColumnDefinition Width="566*"/>
+            <ColumnDefinition Width="426*"/>
+            <ColumnDefinition Width="512*"/>
         </Grid.ColumnDefinitions>
-        <Button Grid.Column="0" Grid.Row="0" Content="Add account" Margin="21,69,24.8,419.8"/>
-        <Button Grid.Column="0" Grid.Row="0" Content="Add few accounts" Margin="21,106,24.8,382.8"/>
-        <Button Grid.Column="0" Grid.Row="0" Content="Delete all accounts" Margin="21,143,24.8,345.8"/>
-        <!--<ListBox Name="addresses_lstBox" Grid.Column="1" HorizontalAlignment="Left" Height="227" Margin="10.2,47,0,0" VerticalAlignment="Top" Width="197" SelectionChanged="ListBox_SelectionChanged"/>-->
-        <ScrollViewer Grid.Column="1" Margin="7.2,10,0.2,-0.2">
+        <Button Grid.Column="0" Grid.Row="0" Content="Add account" Margin="21,69,25.4,551.4" Background="#FF575757" Foreground="White" Cursor="Hand"/>
+        <Button Grid.Column="0" Grid.Row="0" Content="Add few accounts" Margin="21,124,25.4,495.4" Background="#FF575757" Foreground="White" Cursor="Hand"/>
+        <Button Grid.Column="0" Grid.Row="0" Content="Delete all accounts" Margin="21,180,25.4,444.4" Background="#FF575757" Foreground="White" Cursor="Hand"/>
+        <ScrollViewer Grid.Column="1" Margin="7.6,10,0.2,-0.6">
             <StackPanel x:Name="addressesPanel">
             </StackPanel>
         </ScrollViewer>
-        <ComboBox Name="mainComboBox" HorizontalAlignment="Left" Margin="21,10,0,0" VerticalAlignment="Top" Width="163">
-            <!--<ComboBoxItem Name="UserInfoItem" Content="Info about account" HorizontalContentAlignment="Center" Width="163"/>-->
-            <ComboBoxItem Content="LogOut" HorizontalContentAlignment="Center" Width="163" Background="red" Selected="ComboBoxItem_Selected"/>
+        <ComboBox Name="mainComboBox" HorizontalAlignment="Left" Margin="21,10,0,0" VerticalAlignment="Top" Width="127" Height="22">
+            <ComboBox.Background>
+                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="#FFF0F0F0" Offset="0"/>
+                    <GradientStop Color="#FF4C3030" Offset="1"/>
+                </LinearGradientBrush>
+            </ComboBox.Background>
+            <ComboBoxItem Content="LogOut" HorizontalContentAlignment="Center" Background="red" Selected="ComboBoxItem_Selected" Margin="0,0,-1.4,0" Cursor="Hand"/>
         </ComboBox>
-        <ScrollViewer Grid.Column="3">
-            <StackPanel x:Name="messagesPanel" Width="516">
-            </StackPanel>
-        </ScrollViewer>
         <DockPanel Grid.Column="3" HorizontalAlignment="Left" Height="100" LastChildFill="False" Margin="197.8,229,0,0" VerticalAlignment="Top" Width="100"/>
+        <TreeView Name="messagesTree" Grid.Column="3" HorizontalAlignment="Left" Height="650" Margin="10.8,10,0,0" VerticalAlignment="Top" Width="407" Background="#FF2B414B"/>
+        <WebBrowser Name="htmlPage" Grid.Column="4" HorizontalAlignment="Left" Height="650" Margin="8.4,10,0,0" VerticalAlignment="Top" Width="494" OpacityMask="#FF2B414B" Visibility="Hidden"/>
     </Grid>
 </Window>
