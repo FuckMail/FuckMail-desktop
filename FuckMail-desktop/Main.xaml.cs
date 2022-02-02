@@ -24,26 +24,51 @@ using MimeKit;
 namespace FuckMail_desktop
 {
     /// <summary>
-    /// Логика взаимодействия для Window1.xaml
+    /// Logic for Window1.xaml
     /// </summary>
     public partial class Main : Window
     {
-        Config config = new Config();
+        Config config = new Config(); // Init Config class
 
         class SomeType
         {
+            /// <summary>
+            /// addresses (string[]):
+            ///     This is param equal all got addresses from user.
+            /// </summary>
+
             public string[] addresses { get; set; }
         }
 
         class AddressDataType {
-            public _AddressDataType data { get; set; }
+            /// <summary>
+            /// data (WrappedAddressDataType):
+            ///     This is response from server.
+            /// </summary>
+
+            public WrappedAddressDataType data { get; set; }
         }
 
-        class _AddressDataType {
+        class WrappedAddressDataType {
+            /// <summary>
+            /// address (string):
+            ///     This is user mail address.
+            /// password (string):
+            ///     This is user mail password.
+            /// proxy_url (string)
+            ///     This is user mail proxy url.
+            /// </summary>
+
             public string address { get; set; }
             public string password { get; set; }
             public string proxy_url { get; set; }
         }
+
+        class AddressState {
+            public string address;
+        }
+
+        AddressState address_state = new AddressState(); // Init address state
 
         public Main(string username, string sessionID)
         {
@@ -66,11 +91,8 @@ namespace FuckMail_desktop
 
             foreach(string address in Addresses.addresses)
             {
-                Button address_button = new Button();
+                Button address_button = new Button{ Content=address, Height=35, Name=username, Cursor=Cursors.Hand};
                 Label address_label = new Label();
-                address_button.Content = address;
-                address_button.Height = 35;
-                address_button.Name = username;
                 address_button.Click += ClickHandler;
                 addressesPanel.Children.Add(address_button);
                 addressesPanel.Children.Add(address_label);
@@ -78,6 +100,7 @@ namespace FuckMail_desktop
         }
 
         private void getAllMessages(string host, string username, string address) {
+            address_state.address = address;
             var url = String.Format("http://{0}/api/address_data/{1}/{2}", host, username, address);
             var request = WebRequest.Create(url);
             request.Method = "GET";
@@ -104,13 +127,12 @@ namespace FuckMail_desktop
                     for (int i = 0; i < inbox.Count; i++)
                     {
                         var message = inbox.GetMessage(i);
-                        Button message_button = new Button();
+                        Button message_button = new Button { DataContext = String.Format("{0}user{1}", username, message.MessageId),
+                            Height=40, Width=355, Content= message.Subject};
                         Label message_label = new Label();
-                        message_button.Height = 40;
-                        message_button.Content = message.Subject;
-                        Console.WriteLine(message.TextBody);
-                        messagesPanel.Children.Add(message_button);
-                        messagesPanel.Children.Add(message_label);
+                        message_button.Click += ShowBodyContent;
+                        messagesTree.Items.Add(message_button);
+                        messagesTree.Items.Add(message_label);
                     }
 
                     client.Disconnect(true);
@@ -121,14 +143,19 @@ namespace FuckMail_desktop
             }
         }
 
-        private delegate void starterdelegate(object sender, RoutedEventArgs e);
-
         private void ClickHandler(object sender, RoutedEventArgs e)
         {
             Button btn = sender as Button;
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 getAllMessages(config.host, btn.Name.ToString(), btn.Content.ToString());
             }));
+        }
+
+        private void ShowBodyContent(object sender, RoutedEventArgs e) {
+            var message_button = sender as Button;
+            string message_id = message_button.DataContext.ToString();
+            htmlPage.Visibility = Visibility;
+            htmlPage.Navigate(String.Format("http://{0}/api/show_message/{1}", config.host, String.Format("{0}address{1}", message_id, address_state.address)));
         }
 
         private void ComboBoxItem_Selected(object sender, RoutedEventArgs e)
