@@ -22,27 +22,43 @@ using System.Configuration;
 namespace FuckMail_desktop
 {
     /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
+    /// Logic for MainWindow.xaml
     /// </summary>
     public partial class Auth : Window
     {
-        Config config = new Config();
+        Config config = new Config(); // Init config class.
+        ErrorType error_type = new ErrorType(); // Init error type.
 
-        class SomeType {
+        class ErrorType {
+            /// <summary>
+            /// Error type
+            /// message (string):
+            ///     This is error message.
+            /// </summary>
+
+            public string message { get; set; }
+        }
+
+        class ResponseType {
+            /// <summary>
+            /// Response type
+            /// response (bool):
+            ///     This is response from server. Default value: false or true.
+            /// </summary>
+
             public bool response { get; set; }
         }
 
         public Auth()
         {
-            //string host = ConfigurationManager.AppSettings.Get("host");
-
+            // Check 'data' folder.
             if (!Directory.Exists("data"))
             {
                 Directory.CreateDirectory("data");
-                InitializeComponent();
             }
             else {
-                int count_files = Directory.GetFiles("data").Length;
+                int count_files = Directory.GetFiles("data").Length; // Count files in 'data' folder.
+                // In the 'data' folder must be one file.
                 if (count_files != 1)
                 {
                     Directory.Delete("data", true);
@@ -50,97 +66,154 @@ namespace FuckMail_desktop
                 }
                 else if (count_files == 1){
 
-                    string[] fileName = Directory.GetFiles(@"data");
-                    string data = File.ReadAllText(fileName[0]);
-                    string[] metadata = data.Split(':');
-                    
+                    string[] fileName = Directory.GetFiles(@"data"); // Get all files from data.
+                    string data = File.ReadAllText(fileName[0]); // Read main file.
+                    string[] metadata = data.Split(':'); // Separation string with ':'.
+                    string sessionID = fileName[0].Replace(@"data\", ""); // After separation to set sessionID.
+
+                    // In metadata must be only two values after separation.
                     if (metadata.Length < 2) {
                         Directory.Delete("data", true);
                         Directory.CreateDirectory("data");
                     }
                     else
                     {
-                        if (!CheckAuth(config.host, metadata[0], metadata[1], false))
+                        /// <summary>
+                        /// Call CheckAuth function with params
+                        /// config.host (string):
+                        ///     This is param from Config class. host only return value from App.config file.
+                        ///
+                        /// metadata[0] (string):
+                        ///     This is username param.
+                        ///
+                        /// metadata[1] (string):
+                        ///     This is password param.
+                        ///
+                        /// sessionID (string):
+                        ///     This is session id.
+                        ///
+                        /// false (bool):
+                        ///     This is param for check md5 convert. Default value: false.
+                        /// </summary>
+
+                        if (!CheckAuth(config.host, metadata[0], metadata[1], sessionID, false))
                         {
                             Directory.Delete("data", true);
                             Directory.CreateDirectory("data");
                         }
                         else
                         {
-                            string sessionID = fileName[0].Replace(@"data\", "");
-                            Hide();
-                            Main main_window = new Main(metadata[0], sessionID);
-                            main_window.ShowDialog();
-                            Close();
+                            Hide(); // Hide process is Auth Window.
+                            Main main_window = new Main(metadata[0], sessionID); // Init Main Windows.
+                            main_window.ShowDialog(); // Call Main Window.
+                            Close(); // Close process is Auth Window.
                         }
                     }
                 }
             }
+            InitializeComponent();
         }
 
         private void login_btn_Click(object sender, RoutedEventArgs e)
         {
-            string username = username_txtBox.Text;
-            string password = password_txtBox.Password;
+            string username = username_txtBox.Text; // Get username from username TextBox how content.
+            string password = password_txtBox.Password; // Get username from password TextBox how content.
 
+            // Check username and password for correct input.
             if (username == "" || password == "")
             {
                 MessageBox.Show("Fields don't should be empty!");
             }
             else
             {
-                if (!CheckAuth(config.host, username, password, true))
+                Random rand = new Random(); // Init Random class.
+                var newCongiFileName = CreateMD5(rand.Next(10).ToString()); // Call MD5 function for generate name of Config File.
+
+                // Check auth user.
+                if (!CheckAuth(config.host, username, password, newCongiFileName, true))
                 {
-                    MessageBox.Show("Incorrect data!");
+                    if (error_type.message == "")
+                    {
+                        MessageBox.Show("Incorrect data!");
+                    }
+                    else {
+                        MessageBox.Show(error_type.message);
+                    }
                 }
                 else
                 {
-                    Random rand = new Random();
-                    var newCongiFileName = CreateMD5(rand.Next(10).ToString());
-
+                    // Create new Config File.
                     using (FileStream fs = File.Create(String.Format("data/{0}", newCongiFileName)))
                     {
-                        byte[] w_username = new UTF8Encoding(true).GetBytes(username);
-                        byte[] w_password = new UTF8Encoding(true).GetBytes(CreateMD5(password));
-                        byte[] w_symbol = new UTF8Encoding(true).GetBytes(":");
+                        byte[] w_username = new UTF8Encoding(true).GetBytes(username); // Write username.
+                        byte[] w_password = new UTF8Encoding(true).GetBytes(CreateMD5(password)); // Write password.
+                        byte[] w_symbol = new UTF8Encoding(true).GetBytes(":"); // Write symbol which between username and password.
                         fs.Write(w_username, 0, w_username.Length);
                         fs.Write(w_symbol, 0, w_symbol.Length);
                         fs.Write(w_password, 0, w_password.Length);
                     }
 
-                    Hide();
-                    Main main_window = new Main(username, newCongiFileName);
-                    main_window.ShowDialog();
-                    Close();
+                    Hide(); // Hide process is Auth Window.
+                    Main main_window = new Main(username, newCongiFileName); // Init Main Windows.
+                    main_window.ShowDialog(); // Call Main Window.
+                    Close(); // Close process is Auth Window.
                 }
             }
         }
 
-        public bool CheckAuth(string host, string username, string password, bool md5) {
-            string hashPass = md5 ? CreateMD5(password) : password;
-            var url = String.Format("http://{0}/api/auth/{1}/{2}", host, username, hashPass);
-            var request = WebRequest.Create(url);
-            request.Method = "GET";
+        public bool CheckAuth(string host, string username, string password, string sessionid, bool md5) {
+            /// <summary>
+            /// All get params
+            /// host (string):
+            ///     This is param from Config class. host only return value from App.config file.
+            ///
+            /// username (string):
+            ///     This is username param.
+            ///
+            /// password (string):
+            ///     This is password param.
+            ///
+            /// sessionid (string):
+            ///     This is session id.
+            ///
+            /// md5 (bool):
+            ///     This is param for check md5 convert. Default value: false.
+            ///
+            /// return (bool): boolean value from ResponseType. true or false
+            /// </summary>
 
-            var webResponse = request.GetResponse();
-            var webStream = webResponse.GetResponseStream();
+            try
+            {
+                string hashPass = md5 ? CreateMD5(password) : password; // Check md5.
+                var url = String.Format("http://{0}/api/auth/{1}/{2}/{3}", host, username, hashPass, sessionid); // Format correct url
+                var request = WebRequest.Create(url); // Create Web Requests.
+                request.Method = "GET"; // Set GET method.
 
-            var reader = new StreamReader(webStream);
-            var data = reader.ReadToEnd();
+                var webResponse = request.GetResponse(); // Get Response.
+                var webStream = webResponse.GetResponseStream(); // Get Stream Response.
 
-            SomeType Response = JsonConvert.DeserializeObject<SomeType>(data);
-            return Response.response;
+                var reader = new StreamReader(webStream); // Read stream response.
+                var data = reader.ReadToEnd(); // Read end data.
+
+                error_type.message = ""; // Set message for ErrorType of classs.
+                ResponseType Response = JsonConvert.DeserializeObject<ResponseType>(data); // Deserialize data from response.
+                return Response.response; // Return deserialize response.
+            }
+            catch (Exception e) {
+                error_type.message = e.Message; // Set error message.
+                return false; // Return 'false' bool object.
+            }
         }
 
         public static string CreateMD5(string input)
         {
-            // Use input string to calculate MD5 hash
+            // Use input string to calculate MD5 hash.
             using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
             {
                 byte[] inputBytes = Encoding.ASCII.GetBytes(input);
                 byte[] hashBytes = md5.ComputeHash(inputBytes);
 
-                // Convert the byte array to hexadecimal string
+                // Convert the byte array to hexadecimal string.
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < hashBytes.Length; i++)
                 {
@@ -152,7 +225,6 @@ namespace FuckMail_desktop
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-
         }
     }
 }
